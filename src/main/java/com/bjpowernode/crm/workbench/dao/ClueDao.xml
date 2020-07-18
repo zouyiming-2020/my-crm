@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.workbench.dao.ClueDao">
+    <select id="findClueByOwner" resultType="Clue">
+        select
+            c.id,
+            c.fullname,
+            c.appellation,
+            u.name as owner,
+            c.company,
+            c.job,
+            c.email,
+            c.phone,
+            c.website,
+            c.mphone,
+            c.state,
+            c.source,
+            c.description,
+            c.contactSummary,
+            c.nextContactTime,
+            c.address,
+            c.createTime,
+            c.createBy,
+            c.editTime,
+            c.editBy
+        from tbl_clue c , tbl_user u where u.id = c.owner  and u.id=#{owner}
+
+    </select>
+
+
+    <select id="finClueByClueId" resultType="Clue">
+        select * from tbl_clue where id=#{clueId}
+    </select>
+
+
+    <select id="deleteBindedAct">
+        delete from tbl_clue_activity_relation
+        where id=#{relationId}
+    </select>
+
+
+    <select id="findActNotBinded" resultType="Activity">
+        select *
+        from tbl_activity
+        <where>
+            <if test="name!=null and name!=''">
+                and  name like '%' #{name} '%'
+             </if>
+             <if test="clueId!=null and clueId!=''">
+                and id not in (select activityId from tbl_clue_activity_relation where clueId=#{clueId} )
+             </if>
+      </where>
+    </select>
+
+    <insert id="addNewAct">
+        insert into tbl_clue_activity_relation
+        (id,activityId,clueId)
+        values
+        (#{id},#{actId},#{clueId})
+    </insert>
+
+    <delete id="deleteClueById">
+        delete from tbl_clue where id=#{id}
+    </delete>
+
+
+    <select id="getClueListX" resultType="Clue">
+        select
+           c.id,
+            c.fullname,
+            c.appellation,
+            u.name as owner,
+            c.company,
+            c.job,
+            c.email,
+            c.phone,
+            c.website,
+            c.mphone,
+            c.state,
+            c.source,
+            c.description,
+            c.contactSummary,
+            c.nextContactTime,
+            c.address,
+            c.createTime,
+            c.createBy,
+            c.editTime,
+            c.editBy
+        from tbl_clue c , tbl_user u
+        <where>
+          and u.id = c.owner
+          and u.id=#{owner}
+
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="getClueCount" resultType="Integer">
+        select count(*)
+        from tbl_clue c , tbl_user u
+        where u.id = c.owner  and u.id=#{owner}
+    </select>
+
+
+    <insert id="saveClue">
+        insert into tbl_clue
+        (
+        id,
+        fullname,
+        appellation,
+        owner,
+        company,
+        job,
+        email,
+        phone,
+        website,
+        mphone,
+        state,
+        source,
+        description,
+        contactSummary,
+        nextContactTime,
+        address,
+        createTime,
+        createBy
+        )
+        values
+        (
+        #{id},
+        #{fullname},
+        #{appellation},
+        #{owner},
+        #{company},
+        #{job},
+        #{email},
+        #{phone},
+        #{website},
+        #{mphone},
+        #{state},
+        #{source},
+        #{description},
+        #{contactSummary},
+        #{nextContactTime},
+        #{address},
+        #{createTime},
+        #{createBy}
+
+        )
+    </insert>
+
+    <update id="updateClue">
+        update tbl_clue
+        <set>
+          <if test="fullname!=null and fullname!=''">
+               fullname=#{fullname},
+          </if>
+            <if test="owner!=null and owner!=''">
+                owner=#{owner},
+            </if>
+            <if test="company!=null and company!=''">
+                company=#{company},
+            </if>
+            <if test="job!=null and job!=''">
+                job=#{job},
+            </if>
+            <if test="email!=null and email!=''">
+                email=#{email},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone=#{phone},
+            </if>
+            <if test="website!=null and website!=''">
+                website=#{website},
+            </if>
+            <if test="appellation!=null and appellation!=''">
+                appellation=#{appellation},
+            </if>
+
+        </set>
+
+        where id=#{id}
+    </update>
+
+    <delete id="deleteClueByIds">
+        delete from tbl_clue
+        where id in
+        <foreach collection="array" open="(" close=")" separator=","  item="id">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
+
+

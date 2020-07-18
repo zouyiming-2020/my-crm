@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.workbench.dao.ActDao">
+
+    <select id="findAllAct" resultType="Activity">
+        select
+          a.id,
+          u.name as owner,
+          a.name,
+          a.startDate,
+          a.startDate,
+          a.endDate,
+          a.cost,
+          a.description,
+          a.createTime,
+          a.createBy
+        from tbl_activity a inner join tbl_user u  on a.owner=u.id
+    </select>
+
+
+    <insert id="saveActivity">
+        insert into tbl_activity
+        (
+        id,
+        owner,
+        name,
+        startDate,
+        endDate,
+        cost,
+        description,
+        createTime,
+        createBy
+        )
+        values
+        (
+        #{id},
+        #{owner},
+        #{name},
+        #{startDate},
+        #{endDate},
+        #{cost},
+        #{description},
+        #{createTime},
+        #{createBy}
+        )
+
+    </insert>
+
+    <select id="getActById" resultType="Activity">
+        select * from tbl_activity where id=#{id}
+    </select>
+
+
+    <select id="getActCount" resultType="Long">
+        select count(*) from tbl_activity a , tbl_user u
+        <where>
+            <if test="name!=null and name != ''">
+                and  a.name='%' #{name} '%'
+            </if>
+            <if test="startDate!=null and startDate != ''">
+                and a.startDate &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and a.endDate &lt;= #{endDate}
+            </if>
+            and a.owner=u.id  and u.id=#{id}
+        </where>
+    </select>
+
+
+
+    <select id="getLimAct" resultType="Activity">
+        select
+           a.id,
+          u.name as owner,
+          a.name,
+          a.startDate,
+          a.endDate,
+          a.cost,
+          a.description,
+          a.createTime,
+          a.createBy
+        from tbl_activity a inner join tbl_user u on a.owner=u.id and u.id=#{id}
+        <where>
+            <if test="name!=null and name != ''">
+                  and  a.name like '%' #{name} '%'
+            </if>
+            <if test="startDate!=null and startDate != ''">
+                and a.startDate &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and a.endDate &lt;= #{endDate}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <update id="updateActById">
+        update tbl_activity
+        <set>
+            <if test="owner!=null and owner!=''">
+                owner=#{owner},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="startDate!=null and startDate!=''">
+                startDate=#{startDate},
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                endDate=#{endDate},
+            </if>
+            <if test="editBy!=null and editBy!=''">
+                editBy=#{editBy},
+            </if>
+            <if test="editTime!=null and editTime!=''">
+                editTime=#{editTime},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteActById">
+        delete from tbl_activity where id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findActById" resultType="Activity">
+        select * from tbl_activity where id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <insert id="saveActList">
+        insert into tbl_activity
+        (id,
+        owner,
+        name,
+        startDate,
+        endDate,
+        cost,
+        description,
+        createTime,
+        createBy)
+        values
+        <foreach collection="list" item="a" separator=",">
+            (
+            #{a.id},
+            #{a.owner},
+            #{a.name},
+            #{a.startDate},
+            #{a.endDate},
+            #{a.cost},
+            #{a.description},
+            #{a.createTime},
+            #{a.createBy}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getBindedAct" resultType="Activity">
+        select
+              car.id as relationId,
+              a.id,
+              u.name as owner,
+              a.name,
+              a.startDate,
+              a.endDate
+        from
+            tbl_activity a,
+            tbl_user u,
+            tbl_clue c,
+            tbl_clue_activity_relation car
+        <where>
+            <if test="name!=null and name!=''">
+                a.name like '%' #{name} '%'
+            </if>
+            and   car.clueId=c.id
+            and   a.owner=u.id
+            and   c.id=#{clueId}
+            and   a.id=car.activityId
+        </where>
+
+    </select>
+
+    <select id="getActNameById" resultType="String">
+        select name from tbl_activity where id=#{id}
+    </select>
+
+</mapper>
+
+

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.workbench.dao.TranDao">
+
+    <!--void saveTran(Tran t);-->
+    <insert id="saveTran">
+        insert into tbl_tran
+        (
+        id,
+        owner,
+        money,
+        name,
+        expectedDate,
+        customerId,
+        stage,
+        type,
+        source,
+        activityId,
+        contactsId,
+        createBy,
+        createTime,
+        description,
+        contactSummary,
+        nextContactTime
+        )
+        values
+        (
+        #{id},
+        #{owner},
+        #{money},
+        #{name},
+        #{expectedDate},
+        #{customerId},
+        #{stage},
+        #{type},
+        #{source},
+        #{activityId},
+        #{contactsId},
+        #{createBy},
+        #{createTime},
+        #{description},
+        #{contactSummary},
+        #{nextContactTime}
+        )
+    </insert>
+
+
+    <select id="getCustomerName" resultType="string">
+        select name from tbl_customer where name like '%' #{name} '%'
+    </select>
+
+
+
+    <select id="getContactsSource" resultType="Contacts">
+        select id,fullname,email,mphone from tbl_contacts
+
+    </select>
+
+    <select id="getTranPage" resultType="Tran">
+        select
+          t.id,
+          t.name,
+          c.fullname as contactsId,
+          t.stage,
+          t.type,
+          t.owner,
+          ct.name as customerId,
+          t.source
+
+        from tbl_tran t,tbl_contacts c,tbl_customer ct
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="getCount" resultType="Integer">
+        select count(*) from tbl_tran
+    </select>
+
+    <select id="findTranById" resultType="Tran">
+        select
+        t.id,
+        u.name as owner,
+        t.money,
+        t.name,
+        t.expectedDate,
+        c.name as customerId,
+        t.stage,
+        t.type,
+        t.source,
+        a.name as activityId,
+        cs.fullname as contactsId,
+        t.description,
+        t.contactSummary,
+        t.nextContactTime,
+        t.editBy,
+        t.editTime,
+        t.createBy,
+        t.createTime
+        from
+        tbl_tran t,tbl_user u,tbl_activity a,tbl_customer c,tbl_contacts cs
+        where
+        u.id=t.owner and a.id=t.activityId and c.id=t.customerId and cs.id=t.contactsId
+        and t.id=#{id}
+    </select>
+
+
+    <update id="updateTran">
+        update tbl_tran set stage=#{stage},editBy=#{editBy},editTime=#{editTime}
+        where id=#{id}
+</update>
+</mapper>
